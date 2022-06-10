@@ -13,7 +13,6 @@ class LIFOCache(BaseCaching):
         """ assign to the dictionary """
         if key and item:
             self.cache_data[key] = item
-
         if len(self.cache_data) > BaseCaching.MAX_ITEMS:
             self.cache_data.pop(self.last_item)
             print('DISCARD:', self.last_item)
