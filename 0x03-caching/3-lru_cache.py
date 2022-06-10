@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ 3. LRU Caching """
-BaseCaching = __import__('base_caching').BaseCaching
 from collections import deque
+BaseCaching = __import__('base_caching').BaseCaching
 
 
 class LRUCache(BaseCaching):
