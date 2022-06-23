@@ -3,6 +3,8 @@
 from typing import List
 import re
 import logging
+import mysql.connector
+import os
 
 
 class RedactingFormatter(logging.Formatter):
@@ -26,6 +28,9 @@ class RedactingFormatter(logging.Formatter):
             self.SEPARATOR)
 
 
+PII_FIELDS = ('name', 'email', 'password', 'ssn', 'phone')
+
+
 def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str) -> str:
     """ Returns the log message obfuscated with Regex """
@@ -33,3 +38,27 @@ def filter_datum(fields: List[str], redaction: str,
         message = re.sub(item + '=.*?' + separator, item + '=' +
                          redaction + separator, message)
     return message
+
+
+def get_logger() -> logging.Logger:
+    """ Returns a Logger object """
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(RedactingFormatter(list(PII_FIELDS)))
+    logger.addHandler(stream_handler)
+
+    return logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """ Connect to mysql server with environmental vars """
+    db_connect = mysql.connector.connect(
+        user=os.getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
+        password=os.getenv('PERSONAL_DATA_DB_PASSWORD', ''),
+        host=os.getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
+        database=os.getenv('PERSONAL_DATA_DB_NAME')
+    )
+    return db_connect
