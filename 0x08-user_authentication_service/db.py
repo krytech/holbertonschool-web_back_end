@@ -50,7 +50,18 @@ class DB:
         for key in kwargs.keys():
             if key not in user_keys:
                 raise InvalidRequestError
-        result = self._session.query(User).filter_by(**kwargs).first()
-        if result is None:
+        user = self._session.query(User).filter_by(**kwargs).first()
+        if user is None:
             raise NoResultFound
-        return result
+        return user
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """ Update user attribute and
+            commits changes to the database
+        """
+        user = self.find_user_by(id=user_id)
+        for key, value in kwargs.items():
+            if not hasattr(user, key):
+                raise ValueError
+            setattr(user, key, value)
+        self._session.commit()
