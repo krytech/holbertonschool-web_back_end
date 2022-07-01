@@ -45,14 +45,12 @@ class DB:
         """ Returns the first row found in users table
             as filtered by the method's input arguments
         """
-        user_keys = User.__table__.columns.keys()
+        user = self.__session.query(User).filter_by(**kwargs).first()
 
-        for key in kwargs.keys():
-            if key not in user_keys:
-                raise InvalidRequestError
-        user = self._session.query(User).filter_by(**kwargs).first()
         if user is None:
             raise NoResultFound
+        if kwargs is None:
+            raise InvalidRequestError
         return user
 
     def update_user(self, user_id: int, **kwargs) -> None:
