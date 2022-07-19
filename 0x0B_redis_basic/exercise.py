@@ -4,6 +4,7 @@
 from functools import wraps
 from typing import Callable, Optional, Union
 from uuid import uuid4
+from grpc import Call
 import redis
 
 
@@ -20,8 +21,23 @@ def count_calls(method: Callable) -> Callable:
     return counter
 
 
+def call_history(method: Callable) -> Callable:
+    """ Stores the history of inputs and outputs for a patricular function.
+    """
+    method_name = method.__qualname__
+    @wraps(method)
+
+    def history(self, data):
+        """ Stores the history of inputs and outputs. """
+        self._redis.rpush(method_name + ":inputs",
+                          "('" + str(data) + "',)")
+        self._redis.rpush(method_name + ":outputs", method(self, data))
+        return method(self, data)
+    return history
+
+
 class Cache:
-    """ Cache class that stores an instance of the Redis client
+    """ Cache class that stores an instance of the Redis client.
     """
     def __init__(self):
         """ Initalize cache class. """
@@ -29,6 +45,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """ Generates a random uuid key, stores in Redis. """
         key = str(uuid4())
