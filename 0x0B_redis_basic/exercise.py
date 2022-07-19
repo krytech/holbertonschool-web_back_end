@@ -12,8 +12,8 @@ def count_calls(method: Callable) -> Callable:
     """ Counts how many times methods of Cache class are called.
     """
     method_name = method.__qualname__
-    @wraps(method)
 
+    @wraps(method)
     def counter(self, data):
         """ Increment counter. """
         self._redis.incr(method_name)
@@ -25,8 +25,8 @@ def call_history(method: Callable) -> Callable:
     """ Stores the history of inputs and outputs for a patricular function.
     """
     method_name = method.__qualname__
-    @wraps(method)
 
+    @wraps(method)
     def history(self, data):
         """ Stores the history of inputs and outputs. """
         self._redis.rpush(method_name + ":inputs",
