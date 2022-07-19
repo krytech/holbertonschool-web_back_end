@@ -4,7 +4,6 @@
 from functools import wraps
 from typing import Callable, Optional, Union
 from uuid import uuid4
-from grpc import Call
 import redis
 
 
@@ -34,6 +33,19 @@ def call_history(method: Callable) -> Callable:
         self._redis.rpush(method_name + ":outputs", method(self, data))
         return method(self, data)
     return history
+
+
+def replay(method):
+    """ Displays the hiistory of calls of a particular function.
+    """
+    name = method.__qualname__
+    cls = method.__self__
+    print(f"{name} was called {cls.get_int(name)} times:")
+    inputs = cls._redis.lrange(f"{name}:inputs", 0, -1)
+    outputs = cls._redis.lrange(f"{name}:outputs", 0, -1)
+    calls = list(zip(inputs, outputs))
+    for call in calls:
+        print(f"{name}(*{str(call[0])[2:-1]}) -> {str(call[1])[2:-1]}")
 
 
 class Cache:
