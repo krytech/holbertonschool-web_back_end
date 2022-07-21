@@ -4,4 +4,4 @@
 CREATE TRIGGER 'decrease_order' AFTER INSERT
 ON 'orders' FOR EACH ROW UPDATE items
 SET quantity = quantity - NEW.number
-WHERE name = New.item_name
+WHERE name = NEW.item_name
