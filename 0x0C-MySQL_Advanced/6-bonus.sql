@@ -4,7 +4,7 @@
 DELIMITER |
 CREATE PROCEDURE AddBonus (
   IN user_id int,
-  INT project_name varchar(255),
+  IN project_name varchar(255),
   IN score float
 )
 BEGIN
