@@ -1,3 +1,5 @@
 *main.js
 node_modules/
 package-lock.json
+*main_0.js
+*main_1.js
